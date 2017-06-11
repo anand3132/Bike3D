@@ -5,12 +5,13 @@ using UnityEngine.UI;
 
 public class BikeController : MonoBehaviour {
 	// Use this for initialization
-	public int thrust=20;
+	public int thrust = 20;
+	public float rotationSpeed = 2.5f;
 	private Rigidbody rb;
+
 	private Vector3 maxVelocity =new Vector3(150, 0, 0);
 	private Vector3 driveVelocity =new Vector3(20, 0, 0);
 	public Vector3 rotationAxis =new Vector3(1, -1, 0);
-
 
 	public Text gameStatusText;
 	public Text scoreText;
@@ -18,12 +19,6 @@ public class BikeController : MonoBehaviour {
 	public Text FuelText;
 	public Slider FuelSlider;
 
-
-
-	// private Quaternion tiltRotationAngle=new Quaternion(0, 0, 0, 0);
-	//private Quaternion targetRotationAngle=new Quaternion(0,0,0,0);
-
-	private float rotationSpeed = 1.0f;
 
 	void Start() {
 		gameStatusText.text = " ";
@@ -38,7 +33,7 @@ public class BikeController : MonoBehaviour {
 		int BikeSpeed = (int)rb.velocity.x;
 		speedText.text=BikeSpeed.ToString();
 		if (Input.GetKey (KeyCode.UpArrow)) {
-			// FuelSlider.value -= .1f;
+			FuelSlider.value -= 0.05f;
 			if (rb.velocity.x < maxVelocity.x) {
 				rb.AddForce (transform.forward * thrust);
 				//Debug.Log("Forward");
@@ -59,12 +54,13 @@ public class BikeController : MonoBehaviour {
 		// Applying lateral force to left
 		bool lateralForceApplied = false;
 		if (Input.GetKey (KeyCode.LeftArrow)) {
+			
 			if (rb.velocity.x > driveVelocity.x) {
 				int zAngle = (int)transform.eulerAngles.z;
-				Debug.Log ("Angle " + zAngle);
+				//Debug.Log ("Angle " + zAngle);
 				if (zAngle <= 15 && zAngle >= 0 ||
 				   zAngle <= 360 && zAngle >= 345) {
-					Debug.Log ("Entering L");
+					//Debug.Log ("Entering L");
 					lateralForceApplied = true;
 					Quaternion tiltRotationAngle = Quaternion.AngleAxis (15f, rotationAxis) * transform.rotation;
 					rb.transform.rotation = Quaternion.Lerp (transform.rotation, tiltRotationAngle, rotationSpeed * Time.deltaTime);
@@ -77,6 +73,7 @@ public class BikeController : MonoBehaviour {
 
 		// Applying lateral force to right
 		if (Input.GetKey (KeyCode.RightArrow)) {
+			
 			if (rb.velocity.x > driveVelocity.x) {
 				int zAngle = (int)transform.eulerAngles.z;
 				if (zAngle <= 15 && zAngle >= 0 ||
@@ -97,7 +94,6 @@ public class BikeController : MonoBehaviour {
 			if (rb.velocity.x < driveVelocity.x) {
 				return;
 			}
-
 			int zAngle = (int)transform.eulerAngles.z;
 			if (zAngle <= 15 && zAngle >= 0) {
 				Quaternion tiltRotationAngle = Quaternion.AngleAxis (-15f, rotationAxis) * transform.rotation;
@@ -121,16 +117,18 @@ public class BikeController : MonoBehaviour {
 
 	void OnCollisionEnter(Collision collision) {
 		if (collision.transform.tag == "Obstacle") {
-			Debug.Log (collision.transform.tag);
 			gameStatusText.text = "GameOver!!!";
 			if(Time.timeScale!=0)
 				Time.timeScale-=0.5f;
 		}
-		if (collision.transform.tag == "Fuel") {
-			collision.gameObject.SetActive(false);
+
+	}
+	void OnTriggerEnter(Collider other) {
+	
+		if (other.transform.tag == "Fuel") {
+			Debug.Log ("Fuel");
+			other.gameObject.SetActive(false);
 			FuelSlider.value += 20;
-			Debug.Log (collision.transform.tag);
 		}
 	}
-	
 } //MonoBehaviour

@@ -6,7 +6,6 @@ using UnityEngine;
 public class PlatformGenerator : MonoBehaviour {
 	// Use this for initialization
 	public GameObject tobeFollowed=null;
-
 	public GameObject middleTile = null;
 	public Vector3 prevPos;
 	public List<Transform> tiles = new List<Transform> ();
@@ -38,7 +37,6 @@ public class PlatformGenerator : MonoBehaviour {
 		bool movingForward = (velocity.x > 0);
 
 		if (tobeFollowed.transform.position.x > middleTile.transform.position.x && movingForward) {
-			// reposition the last to first tile
 			Transform lastTile = tiles.ElementAt(0);
 			Transform firstTile = tiles.ElementAt (tiles.Count - 1);
 			float sizeX = firstTile.transform.GetComponent<BoxCollider> ().bounds.size.x;
@@ -47,6 +45,30 @@ public class PlatformGenerator : MonoBehaviour {
 			tiles.Add (lastTile);
 			int midPoint = tiles.Count / 2;
 			middleTile = tiles.ElementAt (midPoint).gameObject;
+
+			// do obstacle
+			int randomNumber= (int)Random.Range (0f, 100.0f);
+			Transform obstacle = lastTile.Find ("Obstacle");
+
+			Transform FuelObject = lastTile.Find ("Fuel");
+			if ((randomNumber % 3) == 0) {
+				if (FuelObject != null) {
+					FuelObject.gameObject.SetActive (true);
+
+				}
+				if (obstacle != null) {
+					obstacle.gameObject.SetActive (true);
+				}
+			} else {
+				//Transform obstacle = lastTile.Find ("Obstacle");
+					if (FuelObject != null) {
+					FuelObject.gameObject.SetActive (false);
+
+					}
+				if (obstacle != null) {
+					obstacle.gameObject.SetActive (false);
+				}
+			}
 		}
 
 //		if (tobeFollowed.transform.position.x < middleTile.transform.position.x && !movingForward) {
