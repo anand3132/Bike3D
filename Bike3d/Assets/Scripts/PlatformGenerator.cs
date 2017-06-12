@@ -85,6 +85,13 @@ public class PlatformGenerator : MonoBehaviour {
 
 	public void ResetGame() {
 		Time.timeScale = 1f;
+		bikeInstance.score = 0;
+		bikeInstance.gameStatusText.text = " ";
+		//bikeInstance.scoreText.text ="Score :"+bikeInstance.score;
+		bikeInstance.speedText.text = "0";
+		bikeInstance.FuelSlider.value = 100.0f;
+		bikeInstance.FuelText.text = "Fuel";
+
 		Transform secondTile = tiles.ElementAt(1);
 		Vector3 secondTilePos = secondTile.transform.position;
 		bikeInstance.transform.SetPositionAndRotation(new Vector3(secondTilePos.x, 2.0f, secondTilePos.z), bikeInstance.bikeRotation);

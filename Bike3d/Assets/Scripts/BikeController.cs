@@ -14,7 +14,7 @@ public class BikeController : MonoBehaviour {
 	public int thrust = 20;
 	public float rotationSpeed = 2.5f;
 	private bool lateralForceApplied = false;
-	private float score = 0.0f;
+	public float score = 0.0f;
 	private int bonus = 10;
 	private bool bikeHit = false;
 
@@ -35,6 +35,11 @@ public class BikeController : MonoBehaviour {
 		bikeRotation = gameObject.transform.rotation;
 
 		InitGUI ();
+	}
+
+	void FixedUpdate() {
+		ProcessKeyBoard ();
+		UpdateGUI ();
 	}
 
 	void InitGUI() {
@@ -94,7 +99,7 @@ public class BikeController : MonoBehaviour {
 		if(Input.GetKey(KeyCode.R)){
 			platformInstance.ResetGame();
 		}
-	}
+	}//ProcessKeyBoard
 
 	void UpdateGUI() {
 		int BikeSpeed = (int)rb.velocity.magnitude;
@@ -113,12 +118,7 @@ public class BikeController : MonoBehaviour {
 			Time.timeScale -=0.5f;
 		}
 	}
-
-	void FixedUpdate() {
-		ProcessKeyBoard ();
-		UpdateGUI ();
-	}//FixedUpdate
-
+		
 	void TiltBike(float tiltAngle,float limit) {
 		if (rb.velocity.x > driveVelocity.x) {
 			int zAngle = (int)transform.eulerAngles.z;
