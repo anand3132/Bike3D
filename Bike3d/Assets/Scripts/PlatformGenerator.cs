@@ -5,39 +5,48 @@ using UnityEngine;
 
 public class PlatformGenerator : MonoBehaviour {
 	// Use this for initialization
-	public GameObject tobeFollowed=null;
-	public GameObject middleTile = null;
+	public BikeController bikeInstance = null;
+	private GameObject middleTile = null;
 	public Vector3 prevPos;
 	public List<Transform> tiles = new List<Transform> ();
 
 	void Start () {
-		if (!tobeFollowed) {
+		if (!bikeInstance) {
 			Debug.LogError ("FollowObject not set");
 			return;
 		}
+	
+		// cache the previous position.
+		prevPos = bikeInstance.transform.position;
 
-		prevPos = tobeFollowed.transform.position;
+		// add the tiles to our list.
 		for (int x = 0; x< transform.childCount; x++) {
 			tiles.Add(transform.GetChild(x));
 		}
 
+		// calculate the mid tile.
 		int midPoint = tiles.Count / 2;
 		middleTile = tiles.ElementAt (midPoint).gameObject;
-
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		if (!tobeFollowed) {
+		if (!bikeInstance) {
 			Debug.LogError ("FollowObject not set");
 			return;
 		}
 
-		Vector3 velocity = tobeFollowed.transform.position - prevPos;
+		DoMoveForward ();
+
+	}//Update
+
+	private void DoMoveForward() {
+		Vector3 velocity = bikeInstance.transform.position - prevPos;
 		bool movingForward = (velocity.x > 0);
 
-		if (tobeFollowed.transform.position.x > middleTile.transform.position.x && movingForward) {
-			//Place New Tile Forward 
+		// check if our bike crossed the mid tile while moving forward.
+		if (bikeInstance.transform.position.x > middleTile.transform.position.x && movingForward) {
+			// Move the tile towards the last of our list and re-calculate the mid tile.
 			Transform lastTile = tiles.ElementAt(0);
 			Transform firstTile = tiles.ElementAt (tiles.Count - 1);
 			float sizeX = firstTile.transform.GetComponent<BoxCollider> ().bounds.size.x;
@@ -47,27 +56,38 @@ public class PlatformGenerator : MonoBehaviour {
 			int midPoint = tiles.Count / 2;
 			middleTile = tiles.ElementAt (midPoint).gameObject;
 
-			//Random Obstacle & Fuel Generation
-			int randomNumber= (int)Random.Range (0f, 100.0f);
-			Transform obstacle = lastTile.Find ("Obstacle");
-			Transform FuelObject = lastTile.Find ("Fuel");
-			if ((randomNumber % 3) == 0) {
-				if (FuelObject != null) {
-					FuelObject.gameObject.SetActive (true);
+			// random Obstacle & Fuel Generation
+			DoRandomObstacles (lastTile);
+		}
+	}
 
-				}
-				if (obstacle != null) {
-					obstacle.gameObject.SetActive (true);
-				}
-			} else {
-					if (FuelObject != null) {
-					FuelObject.gameObject.SetActive (false);
+	private void DoRandomObstacles(Transform lastTile) {
+		int randomNumber = (int)Random.Range (0f, 100.0f);
+		Transform obstacle = lastTile.Find ("Obstacle");
+		Transform FuelObject = lastTile.Find ("Fuel");
+		if ((randomNumber % 3) == 0) {
+			if (FuelObject != null) {
+				FuelObject.gameObject.SetActive (true);
+			}
+			if (obstacle != null) {
+				obstacle.gameObject.SetActive (true);
+			}
+		} else {
+			if (FuelObject != null) {
+				FuelObject.gameObject.SetActive (false);
 
-					}
-				if (obstacle != null) {
-					obstacle.gameObject.SetActive (false);
-				}
+			}
+			if (obstacle != null) {
+				obstacle.gameObject.SetActive (false);
 			}
 		}
-	}//Update
+	}
+
+	public void ResetGame() {
+		Time.timeScale = 1f;
+		Transform secondTile = tiles.ElementAt(1);
+		Vector3 secondTilePos = secondTile.transform.position;
+		bikeInstance.transform.SetPositionAndRotation(new Vector3(secondTilePos.x, 2.0f, secondTilePos.z), bikeInstance.bikeRotation);
+		bikeInstance.rb.velocity = Vector3.zero;
+	}
 }//MonoBehaviour
