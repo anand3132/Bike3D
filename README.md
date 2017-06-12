@@ -4,6 +4,6 @@ Its a small assignment project ....for educational purpose. Has lot of bugs....i
 # Bike3D - How to Play...!!!
 * Use arrow keys for Navigation 
 * Red Cubes are the obstacles. Hitting them will end the game
-* Fule your bike by capturing the Blue Sphere and keep moving ahead.
+* Fuel your bike by capturing the Blue Sphere and keep moving ahead.
 * If you run out of fuel, the game ends
-* Press R (Reset button) if any freeze,Crash or bug occurs.
+* Press 'R' (Reset button) if any freeze,Crash or bug occurs.
