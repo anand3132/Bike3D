@@ -79,6 +79,7 @@ public class BikeController : MonoBehaviour {
 		if (Input.GetKey (KeyCode.RightArrow) && bikeHit==false) {
 			TiltBike (-15f, 345.5f);
 		}
+		//Reset Button!!
 		if(Input.GetKey(KeyCode.R)){
 			bikeHit = false;
 			platformInstance.ResetGame();
