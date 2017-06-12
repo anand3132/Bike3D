@@ -9,6 +9,9 @@ public class BikeController : MonoBehaviour {
 	public float rotationSpeed = 2.5f;
 	private Rigidbody rb;
 	bool lateralForceApplied = false;
+	private float score = 0;
+	private int bonus = 10;
+	private bool bikeHit = false;
 
 	private Vector3 maxVelocity =new Vector3(150, 0, 0);
 	private Vector3 driveVelocity =new Vector3(20, 0, 0);
@@ -22,20 +25,29 @@ public class BikeController : MonoBehaviour {
 
 
 	void Start() {
+		bikeHit = false;
 		gameStatusText.text = " ";
-		scoreText.text =" ";
-		speedText.text = " ";
+		scoreText.text ="Score :"+ score;
+		speedText.text = "0";
 		FuelSlider.value = 100.0f;
-		FuelText.text = " ";
+		FuelText.text = "Fuel";
 		rb = GetComponent<Rigidbody>();
 	}
 
 	void FixedUpdate() {
 		int BikeSpeed = (int)rb.velocity.magnitude;
+
+		//HUD Updates
+		scoreText.text="Score :"+(int)score;
 		speedText.text=BikeSpeed.ToString();
+		FuelText.text = "Fuel";
+
+
 		// Applying drive force to move forward
 		if (Input.GetKey (KeyCode.UpArrow)) {
 			FuelSlider.value -= 0.05f;
+			if(bikeHit==false)
+				score += .1f;
 			if (rb.velocity.x < maxVelocity.x) {
 				rb.AddForce (transform.forward * thrust);
 			}
@@ -76,9 +88,7 @@ public class BikeController : MonoBehaviour {
 				rb.transform.rotation = Quaternion.Lerp (transform.rotation, tiltRotationAngle, rotationSpeed * Time.deltaTime);
 			}
 		}
-		if (FuelSlider.value < 100) {
-			FuelText.text = "Fuel";
-		}
+
 		if (FuelSlider.value < 10) {
 			FuelText.text = "Fuel Low!!";
 		}
@@ -88,6 +98,7 @@ public class BikeController : MonoBehaviour {
 		}
 		// Debug.Log (FuelSlider.value);
 	}//FixedUpdate
+
 	void TiltBike(float tiltAngle,float limit)
 	{
 		if (rb.velocity.x > driveVelocity.x) {
@@ -106,6 +117,7 @@ public class BikeController : MonoBehaviour {
 	}
 	void OnCollisionEnter(Collision collision) {
 		if (collision.transform.tag == "Obstacle") {
+			bikeHit = true;
 			gameStatusText.text = "GameOver!!!";
 			if(Time.timeScale!=0)
 				Time.timeScale-=0.5f;
@@ -115,7 +127,7 @@ public class BikeController : MonoBehaviour {
 	void OnTriggerEnter(Collider other) {
 	
 		if (other.transform.tag == "Fuel") {
-			Debug.Log ("Fuel");
+			scoreText.text = "Score :" +(int)( score + bonus);
 			other.gameObject.SetActive(false);
 			FuelSlider.value += 20;
 		}

@@ -37,6 +37,7 @@ public class PlatformGenerator : MonoBehaviour {
 		bool movingForward = (velocity.x > 0);
 
 		if (tobeFollowed.transform.position.x > middleTile.transform.position.x && movingForward) {
+			//Place New Tile Forward 
 			Transform lastTile = tiles.ElementAt(0);
 			Transform firstTile = tiles.ElementAt (tiles.Count - 1);
 			float sizeX = firstTile.transform.GetComponent<BoxCollider> ().bounds.size.x;
@@ -46,7 +47,7 @@ public class PlatformGenerator : MonoBehaviour {
 			int midPoint = tiles.Count / 2;
 			middleTile = tiles.ElementAt (midPoint).gameObject;
 
-			// do obstacle
+			//Random Obstacle & Fuel Generation
 			int randomNumber= (int)Random.Range (0f, 100.0f);
 			Transform obstacle = lastTile.Find ("Obstacle");
 			Transform FuelObject = lastTile.Find ("Fuel");
@@ -59,7 +60,6 @@ public class PlatformGenerator : MonoBehaviour {
 					obstacle.gameObject.SetActive (true);
 				}
 			} else {
-				//Transform obstacle = lastTile.Find ("Obstacle");
 					if (FuelObject != null) {
 					FuelObject.gameObject.SetActive (false);
 
@@ -69,6 +69,5 @@ public class PlatformGenerator : MonoBehaviour {
 				}
 			}
 		}
-	}
-
-}
+	}//Update
+}//MonoBehaviour
