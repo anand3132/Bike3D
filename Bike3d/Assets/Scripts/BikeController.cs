@@ -16,7 +16,7 @@ public class BikeController : MonoBehaviour {
 	private bool lateralForceApplied = false;
 	public float score = 0.0f;
 	private int bonus = 10;
-	private bool bikeHit = false;
+	public bool bikeHit = false;
 
 	private Vector3 maxVelocity =new Vector3(150.0f, 0.0f, 0.0f);
 	private Vector3 driveVelocity =new Vector3(20.0f, 0.0f, 0.0f);
@@ -33,13 +33,12 @@ public class BikeController : MonoBehaviour {
 		// cache the initial transfroms
 		bikePosition = gameObject.transform.position;
 		bikeRotation = gameObject.transform.rotation;
-
 		InitGUI ();
 	}
 
 	void FixedUpdate() {
-		ProcessKeyBoard ();
 		UpdateGUI ();
+		ProcessKeyBoard ();
 	}
 
 	void InitGUI() {
@@ -53,52 +52,55 @@ public class BikeController : MonoBehaviour {
 
 	void ProcessKeyBoard() {
 		// Applying drive force to move forward
-		if (Input.GetKey (KeyCode.UpArrow)) {
+		if (Input.GetKey (KeyCode.UpArrow) && bikeHit == false) {
 			FuelSlider.value -= 0.05f;
-			if(bikeHit==false)
-				score += .1f;
+			score += .1f;
 			if (rb.velocity.x < maxVelocity.x) {
 				rb.AddForce (transform.forward * thrust);
 			}
 		}
-		if (Input.GetKeyUp (KeyCode.UpArrow)) {
+		if (Input.GetKeyUp (KeyCode.UpArrow) && bikeHit==false) {
 			speedText.text = rb.velocity.magnitude.ToString();
 			rb.AddForce(-transform.forward * thrust);
 		}
 		//Applying negative force to stop 
-		if (Input.GetKey (KeyCode.DownArrow)) {
+		if (Input.GetKey (KeyCode.DownArrow) && bikeHit==false) {
 			if (rb.velocity.x > 3f) {
 				rb.AddForce (-transform.forward * thrust);
 			}
 		}
 
 		// Applying lateral force to left
-		if (Input.GetKey (KeyCode.LeftArrow)) {
+		if (Input.GetKey (KeyCode.LeftArrow) && bikeHit==false) {
 			TiltBike (15f, 14.5f);
 		}
 
 		// Applying lateral force to right
-		if (Input.GetKey (KeyCode.RightArrow)) {
+		if (Input.GetKey (KeyCode.RightArrow) && bikeHit==false) {
 			TiltBike (-15f, 345.5f);
+		}
+		if(Input.GetKey(KeyCode.R)){
+			bikeHit = false;
+			platformInstance.ResetGame();
 		}
 
 		// To return to normal angle if no lateral force applied.
-		if (!lateralForceApplied) {
-			if (rb.velocity.x > driveVelocity.x) {
-				int zAngle = (int)transform.eulerAngles.z;
-				if (zAngle <= 15 && zAngle >= 0) {
-					Quaternion tiltRotationAngle = Quaternion.AngleAxis (-15f, rotationAxis) * transform.rotation;
-					rb.transform.rotation = Quaternion.Lerp (transform.rotation, tiltRotationAngle, rotationSpeed * Time.deltaTime);
-				}
-				if (zAngle <= 360 && zAngle >= 345) {
-					Quaternion tiltRotationAngle = Quaternion.AngleAxis (15f, rotationAxis) * transform.rotation;
-					rb.transform.rotation = Quaternion.Lerp (transform.rotation, tiltRotationAngle, rotationSpeed * Time.deltaTime);
-				}
-			}
-		}
-		if(Input.GetKey(KeyCode.R)){
-			platformInstance.ResetGame();
-		}
+//generating bug need to fix
+
+//		if (!lateralForceApplied) {
+//			if (rb.velocity.x > driveVelocity.x) {
+//				int zAngle = (int)transform.eulerAngles.z;
+//				if (zAngle <= 15 && zAngle >= 0) {
+//					Quaternion tiltRotationAngle = Quaternion.AngleAxis (-15f, rotationAxis) * transform.rotation;
+//					rb.transform.rotation = Quaternion.Lerp (transform.rotation, tiltRotationAngle, rotationSpeed * Time.deltaTime);
+//				}
+//				if (zAngle <= 360 && zAngle >= 345) {
+//					Quaternion tiltRotationAngle = Quaternion.AngleAxis (15f, rotationAxis) * transform.rotation;
+//					rb.transform.rotation = Quaternion.Lerp (transform.rotation, tiltRotationAngle, rotationSpeed * Time.deltaTime);
+//				}
+//			}
+//		}
+	
 	}//ProcessKeyBoard
 
 	void UpdateGUI() {
@@ -109,13 +111,12 @@ public class BikeController : MonoBehaviour {
 		speedText.text=BikeSpeed.ToString();
 		FuelText.text = "Fuel";
 
-
 		if (FuelSlider.value < 10) {
 			FuelText.text = "Fuel Low!!";
 		}
 		if (FuelSlider.value < 1) {
 			gameStatusText.text = "GameOver!!! press R to reset";
-			Time.timeScale -=0.5f;
+			rb.velocity = Vector3.zero;
 		}
 	}
 		
@@ -137,7 +138,7 @@ public class BikeController : MonoBehaviour {
 	void OnCollisionEnter(Collision collision) {
 		if (collision.transform.tag == "Obstacle") {
 			gameStatusText.text = "GameOver!!! Press R to reset";
-			Time.timeScale-=0.5f;
+			rb.velocity = Vector3.zero;
 			bikeHit = true;
 		}
 	}

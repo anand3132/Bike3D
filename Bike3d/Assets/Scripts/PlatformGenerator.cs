@@ -84,10 +84,9 @@ public class PlatformGenerator : MonoBehaviour {
 	}
 
 	public void ResetGame() {
-		Time.timeScale = 1f;
+		bikeInstance.bikeHit = false;
 		bikeInstance.score = 0;
 		bikeInstance.gameStatusText.text = " ";
-		//bikeInstance.scoreText.text ="Score :"+bikeInstance.score;
 		bikeInstance.speedText.text = "0";
 		bikeInstance.FuelSlider.value = 100.0f;
 		bikeInstance.FuelText.text = "Fuel";
