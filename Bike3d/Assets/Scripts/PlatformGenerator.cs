@@ -49,7 +49,6 @@ public class PlatformGenerator : MonoBehaviour {
 			// do obstacle
 			int randomNumber= (int)Random.Range (0f, 100.0f);
 			Transform obstacle = lastTile.Find ("Obstacle");
-
 			Transform FuelObject = lastTile.Find ("Fuel");
 			if ((randomNumber % 3) == 0) {
 				if (FuelObject != null) {
@@ -70,18 +69,6 @@ public class PlatformGenerator : MonoBehaviour {
 				}
 			}
 		}
-
-//		if (tobeFollowed.transform.position.x < middleTile.transform.position.x && !movingForward) {
-//			// reposition the last to first tile
-//			Transform lastTile = tiles.ElementAt(0);
-//			Transform firstTile = tiles.ElementAt (tiles.Count - 1);
-//			float sizeX = firstTile.transform.GetComponent<BoxCollider> ().bounds.size.x;
-//			lastTile.SetPositionAndRotation (firstTile.transform.position + new Vector3 (sizeX, 0, 0),  lastTile.transform.rotation);
-//			tiles.Remove (lastTile);
-//			tiles.Add (lastTile);
-//			int midPoint = tiles.Count / 2;
-//			middleTile = tiles.ElementAt (midPoint).gameObject;
-//		}
 	}
 
 }

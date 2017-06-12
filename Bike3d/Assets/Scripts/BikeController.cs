@@ -8,6 +8,7 @@ public class BikeController : MonoBehaviour {
 	public int thrust = 20;
 	public float rotationSpeed = 2.5f;
 	private Rigidbody rb;
+	bool lateralForceApplied = false;
 
 	private Vector3 maxVelocity =new Vector3(150, 0, 0);
 	private Vector3 driveVelocity =new Vector3(20, 0, 0);
@@ -30,21 +31,20 @@ public class BikeController : MonoBehaviour {
 	}
 
 	void FixedUpdate() {
-		int BikeSpeed = (int)rb.velocity.x;
+		int BikeSpeed = (int)rb.velocity.magnitude;
 		speedText.text=BikeSpeed.ToString();
+		// Applying drive force to move forward
 		if (Input.GetKey (KeyCode.UpArrow)) {
 			FuelSlider.value -= 0.05f;
 			if (rb.velocity.x < maxVelocity.x) {
 				rb.AddForce (transform.forward * thrust);
-				//Debug.Log("Forward");
 			}
 		}
 		if (Input.GetKeyUp (KeyCode.UpArrow)) {
-			//Debug.Log("keyup");
-
 			speedText.text = rb.velocity.magnitude.ToString();
 			rb.AddForce(-transform.forward * thrust);
 		}
+		//Applying negative force to stop 
 		if (Input.GetKey (KeyCode.DownArrow)) {
 			if (rb.velocity.x > 3f) {
 				rb.AddForce (-transform.forward * thrust);
@@ -52,41 +52,13 @@ public class BikeController : MonoBehaviour {
 		}
 
 		// Applying lateral force to left
-		bool lateralForceApplied = false;
 		if (Input.GetKey (KeyCode.LeftArrow)) {
-			
-			if (rb.velocity.x > driveVelocity.x) {
-				int zAngle = (int)transform.eulerAngles.z;
-				//Debug.Log ("Angle " + zAngle);
-				if (zAngle <= 15 && zAngle >= 0 ||
-				   zAngle <= 360 && zAngle >= 345) {
-					//Debug.Log ("Entering L");
-					lateralForceApplied = true;
-					Quaternion tiltRotationAngle = Quaternion.AngleAxis (15f, rotationAxis) * transform.rotation;
-					rb.transform.rotation = Quaternion.Lerp (transform.rotation, tiltRotationAngle, rotationSpeed * Time.deltaTime);
-					if (transform.eulerAngles.z > 15.0f && transform.eulerAngles.z < 345.0f) {
-						transform.eulerAngles = new Vector3 (transform.eulerAngles.x, transform.eulerAngles.y, 14.5f);
-					}
-				}
-			}
+			TiltBike (15f, 14.5f);
 		}
 
 		// Applying lateral force to right
 		if (Input.GetKey (KeyCode.RightArrow)) {
-			
-			if (rb.velocity.x > driveVelocity.x) {
-				int zAngle = (int)transform.eulerAngles.z;
-				if (zAngle <= 15 && zAngle >= 0 ||
-				   zAngle <= 360 && zAngle >= 345) {
-					// Debug.Log ("Entering R");
-					lateralForceApplied = true;
-					Quaternion tiltRotationAngle = Quaternion.AngleAxis (-15f, rotationAxis) * transform.rotation;
-					rb.transform.rotation = Quaternion.Lerp (transform.rotation, tiltRotationAngle, rotationSpeed * Time.deltaTime);
-					if (transform.eulerAngles.z < 345.0f && transform.eulerAngles.z > 15.0f) {
-						transform.eulerAngles = new Vector3 (transform.eulerAngles.x, transform.eulerAngles.y, 345.5f);
-					}
-				}
-			}
+			TiltBike (-15f, 345.5f);
 		}
 
 		// To return to normal angle if no lateral force applied.
@@ -104,7 +76,9 @@ public class BikeController : MonoBehaviour {
 				rb.transform.rotation = Quaternion.Lerp (transform.rotation, tiltRotationAngle, rotationSpeed * Time.deltaTime);
 			}
 		}
-
+		if (FuelSlider.value < 100) {
+			FuelText.text = "Fuel";
+		}
 		if (FuelSlider.value < 10) {
 			FuelText.text = "Fuel Low!!";
 		}
@@ -114,7 +88,22 @@ public class BikeController : MonoBehaviour {
 		}
 		// Debug.Log (FuelSlider.value);
 	}//FixedUpdate
-
+	void TiltBike(float tiltAngle,float limit)
+	{
+		if (rb.velocity.x > driveVelocity.x) {
+			int zAngle = (int)transform.eulerAngles.z;
+			if (zAngle <= 15 && zAngle >= 0 ||
+				zAngle <= 360 && zAngle >= 345) {
+				//Debug.Log ("Entering L");
+				lateralForceApplied = true;
+				Quaternion tiltRotationAngle = Quaternion.AngleAxis (tiltAngle, rotationAxis) * transform.rotation;
+				rb.transform.rotation = Quaternion.Lerp (transform.rotation, tiltRotationAngle, rotationSpeed * Time.deltaTime);
+				if (transform.eulerAngles.z > 15.0f && transform.eulerAngles.z < 345.0f) {
+					transform.eulerAngles = new Vector3 (transform.eulerAngles.x, transform.eulerAngles.y, limit);
+				}
+			}
+		}
+	}
 	void OnCollisionEnter(Collision collision) {
 		if (collision.transform.tag == "Obstacle") {
 			gameStatusText.text = "GameOver!!!";
