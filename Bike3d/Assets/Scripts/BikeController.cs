@@ -85,22 +85,22 @@ public class BikeController : MonoBehaviour {
 			platformInstance.ResetGame();
 		}
 
-		// To return to normal angle if no lateral force applied.
-//generating bug need to fix
+//		 To return to normal angle if no lateral force applied.
+		if (!lateralForceApplied) {
+			if (rb.velocity.x > driveVelocity.x) {
+				int zAngle = (int)transform.eulerAngles.z;
+				if (zAngle <= 15 && zAngle >= 0) {
+					Quaternion tiltRotationAngle = Quaternion.AngleAxis (-15f, rotationAxis) * transform.rotation;
+					rb.transform.rotation = Quaternion.Lerp (transform.rotation, tiltRotationAngle, rotationSpeed * Time.deltaTime);
+				}
+				if (zAngle <= 360 && zAngle >= 345) {
+					Quaternion tiltRotationAngle = Quaternion.AngleAxis (15f, rotationAxis) * transform.rotation;
+					rb.transform.rotation = Quaternion.Lerp (transform.rotation, tiltRotationAngle, rotationSpeed * Time.deltaTime);
+				}
+			}
+		}
 
-//		if (!lateralForceApplied) {
-//			if (rb.velocity.x > driveVelocity.x) {
-//				int zAngle = (int)transform.eulerAngles.z;
-//				if (zAngle <= 15 && zAngle >= 0) {
-//					Quaternion tiltRotationAngle = Quaternion.AngleAxis (-15f, rotationAxis) * transform.rotation;
-//					rb.transform.rotation = Quaternion.Lerp (transform.rotation, tiltRotationAngle, rotationSpeed * Time.deltaTime);
-//				}
-//				if (zAngle <= 360 && zAngle >= 345) {
-//					Quaternion tiltRotationAngle = Quaternion.AngleAxis (15f, rotationAxis) * transform.rotation;
-//					rb.transform.rotation = Quaternion.Lerp (transform.rotation, tiltRotationAngle, rotationSpeed * Time.deltaTime);
-//				}
-//			}
-//		}
+		ReCorrectAngle ();
 	
 	}//ProcessKeyBoard
 
@@ -120,7 +120,11 @@ public class BikeController : MonoBehaviour {
 			rb.velocity = Vector3.zero;
 		}
 	}
-		
+
+	void ReCorrectAngle() {
+		rb.transform.rotation = Quaternion.Lerp (transform.rotation, bikeRotation, rotationSpeed * 0.25f * Time.deltaTime);
+	}
+
 	void TiltBike(float tiltAngle,float limit) {
 		if (rb.velocity.x > driveVelocity.x) {
 			int zAngle = (int)transform.eulerAngles.z;
