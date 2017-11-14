@@ -9,7 +9,9 @@ public class PlatformGenerator : MonoBehaviour {
 	private GameObject middleTile = null;
 	public Vector3 prevPos;
 	public List<Transform> tiles = new List<Transform> ();
-
+	public Material checkPointMaterial;
+	public Material roadMaterial;
+	public int tileCount=0;
 	void Start () {
 		if (!bikeInstance) {
 			Debug.LogError ("FollowObject not set");
@@ -37,13 +39,16 @@ public class PlatformGenerator : MonoBehaviour {
 		}
 
 		DoMoveForward ();
-
+		Debug.Log(tileCount);
 	}//Update
 
 	private void DoMoveForward() {
 		Vector3 velocity = bikeInstance.transform.position - prevPos;
 		bool movingForward = (velocity.x > 0);
-
+		if(GameManager.instance.getGameTimer()>25)
+		{
+			
+		}
 		// check if our bike crossed the mid tile while moving forward.
 		if (bikeInstance.transform.position.x > middleTile.transform.position.x && movingForward) {
 			// Move the tile towards the last of our list and re-calculate the mid tile.
@@ -55,9 +60,14 @@ public class PlatformGenerator : MonoBehaviour {
 			tiles.Add (lastTile);
 			int midPoint = tiles.Count / 2;
 			middleTile = tiles.ElementAt (midPoint).gameObject;
-
+			if(tileCount>8){
+				lastTile.GetComponent<Renderer>().material=checkPointMaterial;
+				lastTile.tag="end";
+			}
+			Debug.Log(lastTile.tag);
 			// random Obstacle & Fuel Generation
 			DoRandomObstacles (lastTile);
+			tileCount++;
 		}
 	}
 
@@ -89,11 +99,17 @@ public class PlatformGenerator : MonoBehaviour {
 		bikeInstance.gameStatusText.text = " ";
 		bikeInstance.speedText.text = "0";
 		bikeInstance.FuelSlider.value = 100.0f;
-		bikeInstance.FuelText.text = "Fuel";
+		bikeInstance.FuelText = "Fuel";
 
 		Transform secondTile = tiles.ElementAt(1);
+		foreach(Transform item in tiles)
+		{
+			item.tag="";
+			item.GetComponent<Renderer>().material=roadMaterial;
+		}
 		Vector3 secondTilePos = secondTile.transform.position;
 		bikeInstance.transform.SetPositionAndRotation(new Vector3(secondTilePos.x, 2.0f, secondTilePos.z), bikeInstance.bikeRotation);
 		bikeInstance.rb.velocity = Vector3.zero;
+		GameManager.instance.SwitchState(GameState.GameStart);
 	}
 }//MonoBehaviour

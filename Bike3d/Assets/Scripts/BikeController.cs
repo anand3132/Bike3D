@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 public class BikeController : MonoBehaviour {
 	public Rigidbody rb;
@@ -11,8 +12,8 @@ public class BikeController : MonoBehaviour {
 	public  Vector3 bikePosition;
 	public	Quaternion bikeRotation;
 
-	public int thrust = 20;
-	public float rotationSpeed = 2.5f;
+	private int thrust = 50;
+	private float rotationSpeed = 2.5f;
 	private bool lateralForceApplied = false;
 	public float score = 0.0f;
 	private int bonus = 10;
@@ -26,8 +27,10 @@ public class BikeController : MonoBehaviour {
 	public Text gameStatusText;
 	public Text scoreText;
 	public Text speedText;
-	public Text FuelText;
+	public String FuelText;
 	public Slider FuelSlider;
+
+	public int BikeSpeed=0;
 
 	void Start() {
 		// cache the initial transfroms
@@ -47,7 +50,7 @@ public class BikeController : MonoBehaviour {
 		scoreText.text ="Score :"+ score;
 		speedText.text = "0";
 		FuelSlider.value = 100.0f;
-		FuelText.text = "Fuel";
+		FuelText = "Fuel";
 	}
 
 	void ProcessKeyBoard() {
@@ -105,18 +108,19 @@ public class BikeController : MonoBehaviour {
 	}//ProcessKeyBoard
 
 	void UpdateGUI() {
-		int BikeSpeed = (int)rb.velocity.magnitude;
+		BikeSpeed = (int)rb.velocity.magnitude;
 
 		//HUD Updates
 		scoreText.text="Score :"+(int)score;
 		speedText.text=BikeSpeed.ToString();
-		FuelText.text = "Fuel";
+		FuelText = "Fuel";
 
 		if (FuelSlider.value < 10) {
-			FuelText.text = "Fuel Low!!";
+			FuelText = "Fuel Low!!";
 		}
 		if (FuelSlider.value < 1) {
-			gameStatusText.text = "GameOver!!! press R to reset";
+			GameManager.instance.SwitchState(GameState.GameLose);
+//			gameStatusText.text = "GameOver!!! press R to reset";
 			rb.velocity = Vector3.zero;
 		}
 	}
@@ -142,9 +146,14 @@ public class BikeController : MonoBehaviour {
 		
 	void OnCollisionEnter(Collision collision) {
 		if (collision.transform.tag == "Obstacle") {
-			gameStatusText.text = "GameOver!!! Press R to reset";
+			GameManager.instance.SwitchState(GameState.GameLose);
+//			gameStatusText.text = "GameOver!!! Press R to reset";
 			rb.velocity = Vector3.zero;
 			bikeHit = true;
+		}
+		if (collision.transform.tag == "end") {
+			GameManager.instance.SwitchState(GameState.GameWin);
+			Debug.Log("Winstate");
 		}
 	}
 
@@ -154,5 +163,6 @@ public class BikeController : MonoBehaviour {
 			FuelSlider.value += 20;
 			other.gameObject.SetActive(false);
 		}
+
 	}
 } //MonoBehaviour
