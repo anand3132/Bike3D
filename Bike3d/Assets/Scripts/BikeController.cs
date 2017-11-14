@@ -19,7 +19,7 @@ public class BikeController : MonoBehaviour {
 	private int bonus = 10;
 	public bool bikeHit = false;
 
-	private Vector3 maxVelocity =new Vector3(150.0f, 0.0f, 0.0f);
+	private Vector3 maxVelocity =new Vector3(200.0f, 0.0f, 0.0f);
 	private Vector3 driveVelocity =new Vector3(20.0f, 0.0f, 0.0f);
 	public Vector3 rotationAxis =new Vector3(1.0f, -1.0f, 0.0f);
 
@@ -29,6 +29,12 @@ public class BikeController : MonoBehaviour {
 	public Text speedText;
 	public String FuelText;
 	public Slider FuelSlider;
+
+	//keyboard events
+	public bool upArrow=false;
+	public bool downArrow=false;
+	public bool leftArrow=false;
+	public bool rightArrow=false;
 
 	public int BikeSpeed=0;
 
@@ -55,32 +61,34 @@ public class BikeController : MonoBehaviour {
 
 	void ProcessKeyBoard() {
 		// Applying drive force to move forward
-		if (Input.GetKey (KeyCode.UpArrow) && bikeHit == false) {
-			FuelSlider.value -= 0.05f;
-			score += .1f;
-			if (rb.velocity.x < maxVelocity.x) {
-				rb.AddForce (transform.forward * thrust);
+		if(bikeHit==false){
+			if (Input.GetKey (KeyCode.UpArrow)||upArrow) {
+				FuelSlider.value -= 0.05f;
+				score += .1f;
+				if (rb.velocity.x < maxVelocity.x) {
+					rb.AddForce (transform.forward * thrust);
+				}
 			}
-		}
-		if (Input.GetKeyUp (KeyCode.UpArrow) && bikeHit==false) {
-			speedText.text = rb.velocity.magnitude.ToString();
-			rb.AddForce(-transform.forward * thrust);
-		}
-		//Applying negative force to stop 
-		if (Input.GetKey (KeyCode.DownArrow) && bikeHit==false) {
-			if (rb.velocity.x > 3f) {
-				rb.AddForce (-transform.forward * thrust);
+//			if (Input.GetKeyUp (KeyCode.UpArrow)||upArrow) {
+//				speedText.text = rb.velocity.magnitude.ToString();
+//				rb.AddForce(-transform.forward * thrust);
+//			}
+			//Applying negative force to stop 
+			if (Input.GetKey (KeyCode.DownArrow)||downArrow) {
+				if (rb.velocity.x > 3f) {
+					rb.AddForce (-transform.forward * thrust);
+				}
 			}
-		}
 
-		// Applying lateral force to left
-		if (Input.GetKey (KeyCode.LeftArrow) && bikeHit==false) {
-			TiltBike (15f, 14.5f);
-		}
+			// Applying lateral force to left
+			if (Input.GetKey (KeyCode.LeftArrow)||leftArrow ) {
+				TiltBike (15f, 14.5f);
+			}
 
-		// Applying lateral force to right
-		if (Input.GetKey (KeyCode.RightArrow) && bikeHit==false) {
-			TiltBike (-15f, 345.5f);
+			// Applying lateral force to right
+			if (Input.GetKey (KeyCode.RightArrow)||rightArrow) {
+				TiltBike (-15f, 345.5f);
+			}
 		}
 		//Reset Button!!
 		if(Input.GetKey(KeyCode.R)){
